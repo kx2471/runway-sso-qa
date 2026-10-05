@@ -189,9 +189,6 @@ html.js .static-preview { display: none; }
         <div class="controls">
           <button class="btn primary" id="runAll">전체 실행</button>
           <button class="btn" id="stop" disabled>정지</button>
-          <div class="seg" role="group" aria-label="실행 속도" id="speed">
-            <button data-s="1.6" aria-pressed="false">느림</button><button data-s="1" aria-pressed="true">보통</button><button data-s="0.35" aria-pressed="false">빠름</button><button data-s="0" aria-pressed="false">즉시</button>
-          </div>
         </div>
         <label class="bug" for="bugSel">버그 주입
           <select id="bugSel">
@@ -457,7 +454,8 @@ appEl.addEventListener('click', (e) => {
    ===================================================================== */
 const vp = document.getElementById('viewport'), cursor = document.getElementById('cursor'), ring = document.getElementById('ring');
 const logEl = document.getElementById('log');
-let speed = 1, stopFlag = false;
+const speed = 0.35; // runner speed is fixed to 'fast'
+let stopFlag = false;
 class StopRun extends Error {}
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms * speed));
 const sel = (id) => appEl.querySelector(`[data-testid="${id}"]`);
@@ -772,11 +770,6 @@ async function run(indices) {
 runAllBtn.addEventListener('click', () => run(TESTS.map((_, i) => i)));
 stopBtn.addEventListener('click', () => { stopFlag = true; });
 casesEl.addEventListener('click', (e) => { const b = e.target.closest('.case'); if (b && !running) run([Number(b.dataset.i)]); });
-document.getElementById('speed').addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return;
-  speed = Number(b.dataset.s);
-  for (const x of e.currentTarget.children) x.setAttribute('aria-pressed', String(x === b));
-});
 document.getElementById('bugSel').addEventListener('change', (e) => {
   BUG = e.target.value; seed(); go('/login');
   for (const s of status) { s.s = 'wait'; s.ms = null; } drawCases();
